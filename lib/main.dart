@@ -24,9 +24,9 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.teal,
         colorScheme: ColorScheme.light(
           primary: Colors.teal,
-          primaryVariant: Colors.teal.shade900,
+          primaryContainer: Colors.teal.shade900,
           secondary: Colors.tealAccent,
-          secondaryVariant: Colors.tealAccent.shade700,
+          secondaryContainer: Colors.tealAccent.shade700,
         ),
       ),
       home: DefaultTabController(
