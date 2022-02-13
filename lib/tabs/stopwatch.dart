@@ -32,6 +32,7 @@ class _StopWatchState extends State<StopWatch> {
       digitHours = "00";
       digitMinutes = "00";
       digitSeconds = "00";
+      laps.clear();
       started = false;
     });
   }
@@ -45,7 +46,7 @@ class _StopWatchState extends State<StopWatch> {
 
   void start() {
     started = true;
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       int localSeconds = seconds + 1;
       int localMinutes = minutes;
       int localHours = hours;
@@ -61,9 +62,9 @@ class _StopWatchState extends State<StopWatch> {
         seconds = localSeconds;
         minutes = localMinutes;
         hours = localHours;
-        digitSeconds = (seconds > 10) ? "$seconds" : "0$seconds";
-        digitMinutes = (minutes > 10) ? "$minutes" : "0$minutes";
-        digitHours = (hours > 10) ? "$hours" : "0$hours";
+        digitSeconds = (seconds >= 10) ? "$seconds" : "0$seconds";
+        digitMinutes = (minutes >= 10) ? "$minutes" : "0$minutes";
+        digitHours = (hours >= 10) ? "$hours" : "0$hours";
       });
     });
   }
@@ -82,10 +83,11 @@ class _StopWatchState extends State<StopWatch> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Center(
+            Center(
                 child: Text(
-              "00:00:00",
-              style: TextStyle(fontSize: 82.0, fontWeight: FontWeight.w600),
+              "$digitHours:$digitMinutes:$digitSeconds",
+              style:
+                  const TextStyle(fontSize: 82.0, fontWeight: FontWeight.w600),
             )),
             Expanded(
               child: Container(
@@ -99,11 +101,32 @@ class _StopWatchState extends State<StopWatch> {
                       border: Border.all(color: Colors.teal, width: 1.5),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    child: const Center(
-                      child: Text(
-                        "Laps appear here Here",
-                        style: TextStyle(color: Colors.black),
-                      ),
+                    child: ListView.builder(
+                      itemCount: laps.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.all(10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                "Lap No. " + (index + 1).toString(),
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                ),
+                              ),
+                              Text(
+                                laps[index],
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -118,10 +141,12 @@ class _StopWatchState extends State<StopWatch> {
                     margin: const EdgeInsets.all(10.0),
                     child: Expanded(
                       child: ElevatedButton(
-                        onPressed: () {},
-                        child: const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Text("Start"),
+                        onPressed: () {
+                          (started) ? stop() : start();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text((started) ? "Pause" : "Start"),
                         ),
                         style: ElevatedButton.styleFrom(
                           shape: const StadiumBorder(),
@@ -132,7 +157,9 @@ class _StopWatchState extends State<StopWatch> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    addLaps();
+                  },
                   icon: const Icon(Icons.flag),
                   color: Colors.black,
                 ),
@@ -141,11 +168,13 @@ class _StopWatchState extends State<StopWatch> {
                     margin: const EdgeInsets.all(10.0),
                     child: Expanded(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          reset();
+                        },
                         child: const Padding(
                           padding: EdgeInsets.all(16.0),
                           child: Text(
-                            "Stop",
+                            "Reset",
                             style: TextStyle(color: Colors.black),
                           ),
                         ),
