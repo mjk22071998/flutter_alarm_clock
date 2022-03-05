@@ -13,16 +13,19 @@ class _CountdownTimerState extends State<CountdownTimer>
 
   late AnimationController controller;
 
+  int _hours = 0, _minutes = 0, _seconds = 0;
+
   @override
   void initState() {
-    controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 90));
+    controller = AnimationController(
+        vsync: this,
+        duration:
+            Duration(seconds: _seconds, minutes: _minutes, hours: _hours));
     super.initState();
   }
 
   String get countText {
-    Duration count = controller.duration! * controller.value;
-    return "${(count.inHours).toString().padLeft(2, "0")}:${(count.inMinutes % 60).toString().padLeft(2, "0")}:${(count.inSeconds % 60).toString().padLeft(2, "0")}";
+    return "${(_hours).toString().padLeft(2, "0")}:${(_minutes).toString().padLeft(2, "0")}:${(_seconds).toString().padLeft(2, "0")}";
   }
 
   @override
@@ -31,19 +34,30 @@ class _CountdownTimerState extends State<CountdownTimer>
     super.dispose();
   }
 
+  void setTime() async {
+    TimeOfDay? timeOfDay= await showTimePicker(
+                    context: context,
+                    initialTime: const TimeOfDay(hour: 00, minute: 00));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
           child: Center(
-            child: AnimatedBuilder(
-              animation: controller,
-              builder: (context, child) => Text(
-                countText,
-                style: const TextStyle(
-                  fontSize: 60,
-                  fontWeight: FontWeight.bold,
+            child: GestureDetector(
+              onTap: () {
+                setTime();
+              },
+              child: AnimatedBuilder(
+                animation: controller,
+                builder: (context, child) => Text(
+                  countText,
+                  style: const TextStyle(
+                    fontSize: 60,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
