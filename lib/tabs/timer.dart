@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 class CountdownTimer extends StatefulWidget {
   const CountdownTimer({Key? key}) : super(key: key);
@@ -29,6 +30,7 @@ class _CountdownTimerState extends State<CountdownTimer>
       } else if (controller.isCompleted) {
         _progress = 0;
         started = !started;
+        FlutterRingtonePlayer.playNotification();
       } else if (controller.isDismissed) {
         //Noting
       }
@@ -37,7 +39,9 @@ class _CountdownTimerState extends State<CountdownTimer>
 
   String get countText {
     Duration count = controller.duration! * controller.value;
-    return "${(count.inHours).toString().padLeft(2, "0")}:${(count.inMinutes % 60).toString().padLeft(2, "0")}:${(count.inSeconds % 60).toString().padLeft(2, "0")}";
+    return (controller.isDismissed)
+        ? "${(controller.duration!.inHours).toString().padLeft(2, "0")}:${(controller.duration!.inMinutes % 60).toString().padLeft(2, "0")}:${(controller.duration!.inSeconds % 60).toString().padLeft(2, "0")}"
+        : "${(count.inHours).toString().padLeft(2, "0")}:${(count.inMinutes % 60).toString().padLeft(2, "0")}:${(count.inSeconds % 60).toString().padLeft(2, "0")}";
   }
 
   @override
@@ -68,11 +72,12 @@ class _CountdownTimerState extends State<CountdownTimer>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              const SizedBox(
+              SizedBox(
                 height: 300,
                 width: 300,
                 child: CircularProgressIndicator(
                   strokeWidth: 6,
+                  value: _progress,
                   backgroundColor: Colors.tealAccent,
                 ),
               ),
@@ -130,7 +135,12 @@ class _CountdownTimerState extends State<CountdownTimer>
                 child: Container(
                   margin: const EdgeInsets.all(10.0),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        controller.reset();
+                        controller.duration = const Duration(seconds: 0);
+                      });
+                    },
                     child: const Padding(
                       padding: EdgeInsets.all(10),
                       child: Text(
