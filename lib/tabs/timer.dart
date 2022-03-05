@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CountdownTimer extends StatefulWidget {
@@ -13,19 +14,30 @@ class _CountdownTimerState extends State<CountdownTimer>
 
   late AnimationController controller;
 
-  int _hours = 0, _minutes = 0, _seconds = 0;
+  double _progress = 0;
 
   @override
   void initState() {
-    controller = AnimationController(
-        vsync: this,
-        duration:
-            Duration(seconds: _seconds, minutes: _minutes, hours: _hours));
+    controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 00));
     super.initState();
+    controller.addListener(() {
+      if (controller.isAnimating) {
+        setState(() {
+          _progress = controller.value;
+        });
+      } else if (controller.isCompleted) {
+        _progress = 0;
+        started = !started;
+      } else if (controller.isDismissed) {
+        //Noting
+      }
+    });
   }
 
   String get countText {
-    return "${(_hours).toString().padLeft(2, "0")}:${(_minutes).toString().padLeft(2, "0")}:${(_seconds).toString().padLeft(2, "0")}";
+    Duration count = controller.duration! * controller.value;
+    return "${(count.inHours).toString().padLeft(2, "0")}:${(count.inMinutes % 60).toString().padLeft(2, "0")}:${(count.inSeconds % 60).toString().padLeft(2, "0")}";
   }
 
   @override
@@ -34,10 +46,18 @@ class _CountdownTimerState extends State<CountdownTimer>
     super.dispose();
   }
 
-  void setTime() async {
-    TimeOfDay? timeOfDay= await showTimePicker(
-                    context: context,
-                    initialTime: const TimeOfDay(hour: 00, minute: 00));
+  void setTime() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => CupertinoTimerPicker(
+        initialTimerDuration: controller.duration!,
+        onTimerDurationChanged: (value) {
+          setState(() {
+            controller.duration = value;
+          });
+        },
+      ),
+    );
   }
 
   @override
@@ -45,22 +65,33 @@ class _CountdownTimerState extends State<CountdownTimer>
     return Column(
       children: [
         Expanded(
-          child: Center(
-            child: GestureDetector(
-              onTap: () {
-                setTime();
-              },
-              child: AnimatedBuilder(
-                animation: controller,
-                builder: (context, child) => Text(
-                  countText,
-                  style: const TextStyle(
-                    fontSize: 60,
-                    fontWeight: FontWeight.bold,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              const SizedBox(
+                height: 300,
+                width: 300,
+                child: CircularProgressIndicator(
+                  strokeWidth: 6,
+                  backgroundColor: Colors.tealAccent,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  setTime();
+                },
+                child: AnimatedBuilder(
+                  animation: controller,
+                  builder: (context, child) => Text(
+                    countText,
+                    style: const TextStyle(
+                      fontSize: 60,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
         Padding(
