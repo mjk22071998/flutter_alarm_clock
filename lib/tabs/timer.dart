@@ -10,8 +10,20 @@ class CountdownTimer extends StatefulWidget {
 class _CountdownTimerState extends State<CountdownTimer> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Countdown Timer here"),
+    return Column(
+      children: const [
+        Expanded(
+          child: Center(
+            child: Text(
+              "00:00:00",
+              style: TextStyle(
+                fontSize: 60,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
