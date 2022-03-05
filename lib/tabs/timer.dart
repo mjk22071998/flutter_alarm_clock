@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class CountdownTimer extends StatefulWidget {
@@ -24,7 +22,7 @@ class _CountdownTimerState extends State<CountdownTimer>
 
   String get countText {
     Duration count = controller.duration! * controller.value;
-    return "${(count.inHours).toString().padLeft(2,"0")}:${(count.inMinutes%60).toString().padLeft(2,"0")}:${(count.inSeconds%60).toString().padLeft(2,"0")}";
+    return "${(count.inHours).toString().padLeft(2, "0")}:${(count.inMinutes % 60).toString().padLeft(2, "0")}:${(count.inSeconds % 60).toString().padLeft(2, "0")}";
   }
 
   @override
@@ -60,12 +58,17 @@ class _CountdownTimerState extends State<CountdownTimer>
                   margin: const EdgeInsets.all(10.0),
                   child: ElevatedButton(
                     onPressed: () {
+                      if (started) {
+                        controller.stop(canceled: true);
+                      } else {
+                        controller.reverse(
+                            from: (controller.value == 0)
+                                ? 1.0
+                                : controller.value);
+                      }
                       setState(() {
                         started = !started;
                       });
-                      controller.reverse(
-                          from:
-                              (controller.value == 0) ? 1.0 : controller.value);
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(10),
