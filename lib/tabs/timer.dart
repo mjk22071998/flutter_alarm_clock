@@ -16,16 +16,37 @@ class _CountdownTimerState extends State<CountdownTimer>
   late AnimationController controller;
 
   @override
+  void initState() {
+    controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 90));
+    super.initState();
+  }
+
+  String get countText {
+    Duration count = controller.duration! * controller.value;
+    return "${(count.inHours).toString().padLeft(2,"0")}:${(count.inMinutes%60).toString().padLeft(2,"0")}:${(count.inSeconds%60).toString().padLeft(2,"0")}";
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Expanded(
+        Expanded(
           child: Center(
-            child: Text(
-              "00:00:00",
-              style: TextStyle(
-                fontSize: 60,
-                fontWeight: FontWeight.bold,
+            child: AnimatedBuilder(
+              animation: controller,
+              builder: (context, child) => Text(
+                countText,
+                style: const TextStyle(
+                  fontSize: 60,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -38,7 +59,14 @@ class _CountdownTimerState extends State<CountdownTimer>
                 child: Container(
                   margin: const EdgeInsets.all(10.0),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        started = !started;
+                      });
+                      controller.reverse(
+                          from:
+                              (controller.value == 0) ? 1.0 : controller.value);
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Text((started) ? "Pause" : "Start"),
