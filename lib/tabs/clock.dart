@@ -38,14 +38,14 @@ class _ClockState extends State<Clock> {
           Text(
             _time,
             style: const TextStyle(
-              fontSize: 45,
+              fontSize: 60,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             _date,
             style: const TextStyle(
-              fontSize: 25,
+              fontSize: 30,
               fontWeight: FontWeight.bold,
             ),
           ),
